@@ -266,8 +266,18 @@ $product = new Product();
         AOS.init();
         
         // Cart functionality
+        function getCart() {
+            try {
+                return JSON.parse(localStorage.getItem('cart')) || [];
+            } catch (e) {
+                console.error('Error reading cart from localStorage', e);
+                localStorage.removeItem('cart');
+                return [];
+            }
+        }
+
         function loadCart() {
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cart = getCart();
             const cartContainer = document.getElementById('cart-items');
             
             if (cart.length === 0) {
@@ -343,7 +353,7 @@ $product = new Product();
         }
         
         function updateQuantity(productId, change) {
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let cart = getCart();
             const item = cart.find(item => item.id == productId);
             
             if (item) {
@@ -355,7 +365,7 @@ $product = new Product();
         }
         
         function removeFromCart(productId) {
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let cart = getCart();
             const newCart = cart.filter(item => item.id != productId);
             localStorage.setItem('cart', JSON.stringify(newCart));
             loadCart();
@@ -364,7 +374,7 @@ $product = new Product();
         }
         
         function updateCartSummary() {
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cart = getCart();
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             
             document.getElementById('subtotal').textContent = `$${total.toLocaleString()}`;
