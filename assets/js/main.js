@@ -107,15 +107,33 @@ function clearCart() {
 }
 
 function updateCartDisplay() {
-    // Enhanced cart display update
-    const cartContainer = document.getElementById('cart-container');
+    // If the current page defines a loadCart() helper use it
+    if (typeof window.loadCart === 'function') {
+        window.loadCart();
+        return;
+    }
+
+    const cartContainer = document.getElementById('cart-items');
+    const cartData = cart || JSON.parse(localStorage.getItem('cart')) || [];
+
     if (cartContainer) {
-        // Update cart items with animations
-        cartContainer.style.opacity = '0.5';
-        setTimeout(() => {
-            // Update content here
-            cartContainer.style.opacity = '1';
-        }, 300);
+        if (cartData.length === 0) {
+            cartContainer.innerHTML =
+                '<p class="text-center text-muted">Tu carrito está vacío</p>';
+            return;
+        }
+
+        let html = '';
+        cartData.forEach(item => {
+            const total = item.price * item.quantity;
+            html += `<div class="d-flex align-items-center mb-2">
+                        <img src="${item.image}" alt="${item.name}" style="width:40px;height:40px;object-fit:cover" class="me-2 rounded">
+                        <div class="flex-grow-1">${item.name} x${item.quantity}</div>
+                        <small class="text-muted">$${total.toLocaleString()}</small>
+                    </div>`;
+        });
+
+        cartContainer.innerHTML = html;
     }
 }
 
